@@ -12,14 +12,18 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/chapter3")
 public class RestApiController {
 
-    List<Coffee> listCoffees = new ArrayList(List.of(
-            new Coffee("Café Especial"),
-            new Coffee("Café Americano"),
-            new Coffee("Café Expreso Brasilia"))
-    );
+    List<Coffee> listCoffees = new ArrayList<>();
+
+    public RestApiController(){
+        this.listCoffees.addAll(List.of(
+                new Coffee("Café Especial"),
+                new Coffee("Café Americano"),
+                new Coffee("Café Expreso Brasilia")
+                ));
+    }
 
     @GetMapping
     String getStatus(){
@@ -31,29 +35,41 @@ public class RestApiController {
         return new ResponseEntity<>("Success", HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("coffee")
+    @GetMapping("coffees")
     ResponseEntity<Iterable<Coffee>> getCoffees(){
         return new ResponseEntity<>(this.listCoffees, HttpStatus.FOUND);
     }
 
-    @PostMapping("coffee")
+    @PostMapping("coffees")
     ResponseEntity<Coffee> createCoffee(@RequestBody Coffee coffee){
-        Coffee newCoffee = new Coffee(coffee.getName());
-        this.listCoffees.add(newCoffee);
-        return new ResponseEntity(newCoffee, HttpStatus.CREATED);
+        this.listCoffees.add(coffee);
+        return new ResponseEntity<Coffee>(coffee, HttpStatus.CREATED);
     }
 
-    @PutMapping("coffee/{id}")
+    @PutMapping("coffees/{id}")
     ResponseEntity<Coffee> updateCoffee(@RequestBody Coffee coffee, @PathVariable String id){
-        Integer index = this.listCoffees.indexOf(coffee);
-        if (index > -1){
-            listCoffees.get(index).setName(coffee.getName());
-            return new ResponseEntity<>(coffee, HttpStatus.OK);
+        int index = -1;
+        for (Coffee c : listCoffees){
+            if (c.getId().equals(id)){
+                index = this.listCoffees.indexOf(c);
+                this.listCoffees.set(index, coffee);
+            }
         }
 
-        //If we are here is 'cause that iteration doesn't match any coffee, so we create a new Coffee
-        this.listCoffees.add(coffee);
-        return new ResponseEntity<>(coffee, HttpStatus.CREATED);
+        return (index == -1) ? this.createCoffee(coffee) : new ResponseEntity<>(coffee, HttpStatus.OK);
+    }
+
+    @DeleteMapping("coffees/{id}")
+    ResponseEntity<String> deleteCoffee(@PathVariable String id){
+        int index = -1;
+        for (Coffee c : listCoffees) {
+            if (c.getId().equals(id)) {
+                index = this.listCoffees.indexOf(c);
+                listCoffees.remove(index);
+            }
+        }
+
+        return (index == -1 ) ? new ResponseEntity<>("Don't deleted", HttpStatus.NOT_FOUND) : new ResponseEntity<>("success", HttpStatus.OK);
     }
 
 }
