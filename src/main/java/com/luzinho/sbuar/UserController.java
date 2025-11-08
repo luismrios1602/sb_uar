@@ -17,9 +17,11 @@ public class UserController {
     String fullName;
 
     final UserConfigProps userConfigProps;
+    final UserBean userBean;
 
-    UserController(UserConfigProps userProps){
+    UserController(UserConfigProps userProps, UserBean userBean){
         this.userConfigProps = userProps;
+        this.userBean = userBean;
     }
 
     @GetMapping("nameValue")
@@ -51,4 +53,10 @@ public class UserController {
     String getFullNameProp(){
         return userConfigProps.getFullName();
     }
+
+    @GetMapping("fullNameBean")
+    String getFullNameBean(){
+        return userBean.getFullName();
+    }
+
 }
