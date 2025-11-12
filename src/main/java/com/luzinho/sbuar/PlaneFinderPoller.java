@@ -14,7 +14,7 @@ public class PlaneFinderPoller {
 
     @NonNull
     private final AircraftRepository aircraftRepository;
-    private WebClient webClient = WebClient.create("http://localhost:7634/planes");
+    private final WebClient webClient = WebClient.create("http://localhost:7634/planes");
 
     @Scheduled(fixedRate = 5000)
     public void pollingPlanes(){
@@ -22,10 +22,13 @@ public class PlaneFinderPoller {
 
         webClient.get()
                 .retrieve()
-                .bodyToFlux(Aircraft.class)
+                .bodyToFlux(AircraftPolled.class)
                 .filter(plane -> !plane.getReg().isEmpty())
                 .toStream()
-                .forEach(aircraftRepository::save);
+                .forEach(aircraft -> {
+                  aircraft.setId(null);
+                  aircraftRepository.save(aircraft);
+                });
 
         aircraftRepository.findAll().forEach(System.out::println);
     }

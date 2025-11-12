@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-@Entity
+@Entity(name = "aircraft_polled")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Aircraft {
+public class AircraftPolled {
     @Id
     @GeneratedValue
     private Long id;
@@ -27,7 +27,7 @@ public class Aircraft {
     private int vertRate;
 
     @JsonProperty("selected_altitude")
-    private int selectedAltitude;
+    private double selectedAltitude;
 
     private double lat, lon, barometer;
 
